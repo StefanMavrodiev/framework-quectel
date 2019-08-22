@@ -23,10 +23,13 @@
 #define PWM_MAX 8193
 int api_adc_init(int pin);
 
+static u32 val = 0;
+
 int analogRead(uint8_t pin)
 {
-  uint32_t val = -1;
-  hal_adc_get_data_polling(0, &val); // * 1400
+  Ql_ADC_Sampling((Enum_ADCPin)0, TRUE);
+  delay(1050);
+  Ql_ADC_Sampling((Enum_ADCPin)0, FALSE);
   return val;
 }
 
@@ -45,12 +48,18 @@ void analogClose(uint8_t pin)
   }
 }
 
+static void Callback_OnADCSampling(Enum_ADCPin adcPin, u32 adcValue, void *customParam)
+{
+    *((u32*)customParam) = (u32)adcValue;
+}
+
 void analogOpen(uint8_t pin, /* val, src, div */...)
 {
   switch (pin)
   {
     case ADC0:
-      api_adc_init(0);
+      Ql_ADC_Register((Enum_ADCPin)0, Callback_OnADCSampling, (void *)&val);
+      Ql_ADC_Init((Enum_ADCPin)0, 5, 200);
       break;
     case PWM0:
     case PWM1:
