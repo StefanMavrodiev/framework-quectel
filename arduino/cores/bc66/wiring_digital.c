@@ -44,6 +44,7 @@ void pinMode(uint8_t pin, uint8_t mode)
         dir = PINDIRECTION_OUT;
       if (mode & OUTPUT_HI)
         level = PINLEVEL_HIGH;
+      Ql_GPIO_Uninit(n->device);
       Ql_GPIO_Init(n->device, dir, level, pull);
     }
   }
